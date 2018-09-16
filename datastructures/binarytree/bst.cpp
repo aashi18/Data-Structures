@@ -1,0 +1,223 @@
+#include "bst.h"
+bst::bst()
+{
+   root = NULL;
+   size = 0;
+}
+bst::~bst()
+{
+   removeAll();
+}
+bool bst::add()
+{
+   node* new_node = new node();
+   return addNode(&root, new_node);
+}
+bool bst::addNode(node** current_node, node* new_node)
+{
+   if(*current_node == NULL)
+   {
+      *current_node = new_node;
+      size++;
+      return true;
+   } 
+   else
+   {
+      if(strcmp(new_node->key, (*current_node)->key) < 0)
+      {
+         return addNode(&((*current_node)->left), new_node);
+      }
+     else if(strcmp(new_node->key, (*current_node)->key) > 0)
+     {
+        return addNode(&((*current_node)->right), new_node);
+     }
+     else
+     {
+        delete new_node;
+        return false;
+     }
+   }
+}
+bool bst::remove(char* key)
+{
+   return removeNode(&root, key);
+}
+
+bool bst::removeNode(METADATA** node, char* key)
+{
+   if(*node != NULL)
+   {
+      if (strcmp(key, (*node)->key) == 0)
+      {
+         removeRootNode(node);
+         size--;
+         return true;
+      }
+      else if(strcmp(key, (*node)->key) < 0)
+      {
+         return removeNode(&((*node)->left), key);
+      }
+      else
+      {
+         return removeNode(&((*node)->right), key);
+      }
+   }
+   else
+   {
+      return false;
+   }
+}
+void bst::removeRootNode(METADATA** root)
+{
+   METADATA* temp;
+   if((*root)->left == NULL && (*root)->right == NULL)
+   {    
+      delete(*root);
+      *root = NULL;
+   }
+   else if((*root)->right == NULL)
+   {
+      temp = *root;
+      *root = (*root)->left;
+      delete(temp);
+   }
+   else if((*root)->left == NULL)
+   {
+      temp = *root;
+      *root = (*root)->right;
+      delete(temp);
+   }
+   else
+   {
+      moveLeftMostNode(&((*root)->right), *root);
+   }
+}
+void bst::moveLeftMostNode(METADATA** node, METADATA* root)
+{
+   if(*node != NULL && (*node)->left == NULL)
+   {
+       METADATA* temp = *node;
+       strcpy(root->key, (*node)->key);
+       strcpy(root->value, (*node)->value);
+       *node = (*node)->right;
+       delete(temp);
+   }
+   else
+   {
+      moveLeftMostNode(&((*node)->left), root);
+   }
+}
+void bst::removeAll()
+{
+   removeAllNodes(root);
+   root = NULL;
+   size = 0;
+}
+void bst::removeAllNodes(METADATA* node)
+{
+   if(node != NULL)
+   {
+      removeAllNodes(node->left);
+      removeAllNodes(node->right);
+      cout << "Removing node - key: " << node->key << "\t" << node->value
+            << endl;
+      delete node;
+   }
+}
+bool bst::get(char* key, char* value)
+{
+   return getNode(root, key, value);
+}
+bool bst::getNode(METADATA* node, char* key, char* value)
+{
+   if(node == NULL)
+   {
+      value[0] = '\0';
+      return false;
+   }
+   else
+   {
+      if(strcmp(key, node->key) == 0)
+      {
+         strcpy(value, node->value);
+         return true;
+      }
+      else if(strcmp(key, node->key) < 0)
+      {
+         return getNode(node->left, key, value);
+      }
+      else
+      {
+         return getNode(node->right, key, value);
+      } 
+   }
+}
+bool bst::contains(char* key)
+{
+   return containsNode(root, key);
+}
+bool bst::containsNode(METADATA* node, char* key)
+{
+   if(node == NULL)
+   {
+       return false;
+   }
+   else
+   {
+      if(strcmp(key, node->key) == 0)
+      {
+         return true;
+      }
+      else if(strcmp(key, node->key) < 0)
+      {
+         return containsNode(node->left, key);
+      }
+      else
+      {
+         return containsNode(node->right, key);
+      } 
+   }
+}
+void bst::displayInOrder()
+{
+   processNodesInOrder(root);
+}
+void bst::processNodesInOrder(METADATA* node)
+{
+   if(node != NULL)
+   {
+      processNodesInOrder(node->left);
+      cout << "key: " << node->key << "\tvalue: " << node->value << endl;
+      processNodesInOrder(node->right);
+   }
+}
+int bst::getSize()
+{
+   return size;
+}
+int bst::getDepth()
+{
+   return getTreeDepth(root);
+}
+int bst::getTreeDepth(METADATA* node)
+{
+   int depth_left;
+   int depth_right;
+   if(node == NULL)
+   {
+      return 0;
+   }
+   else 
+   {
+      depth_left = getTreeDepth(node->left);
+      depth_right = getTreeDepth(node->right);
+      if(depth_left > depth_right)
+      {
+         return depth_left + 1;
+      }
+      else
+      {
+         return depth_right + 1;
+      }
+   }
+}

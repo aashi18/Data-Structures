@@ -1,0 +1,14 @@
+#include <iostream>
+#include"q.cpp"
+using namespace std;
+int main(){
+   q *a = new q(8);
+   a->enq(10);
+   a->enq(20);
+   a->enq(30);
+   for(int i=0; i<3; i++)
+   {
+      cout << a->deq() << endl;
+   } 
+return 0;
+}
